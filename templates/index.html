@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+   <head>
+      <title>DDM</title>
+      <link rel="stylesheet" href="static/layout.css" type="text/css">
+      <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+
+      <script>
+         var show_results = false;
+         var get_input = true;
+         var grid1_ct =0;
+         var grid2_ct =0;
+         var grid3_ct =0;
+        function updatemessage(data){
+          if (data == 'YES') {
+                     document.getElementById('postresult').innerHTML = "You could have Survived!! Hurray!! :D"
+                   }
+                   else {
+                      document.getElementById('postresult').innerHTML = "OOPS!! Sorry you couldn't have survived! :("
+                   }
+          
+            $("#query_div").hide();
+            $("#results_div").show();
+            $("#plotimages").hide();
+        }
+
+         
+        $(document).ready(function(){
+
+          $('#post').click(function(){
+
+                  var inputData = {};
+                   inputData.age = document.getElementById('age').value;
+                   inputData.sex = $('input:radio[name=gender]:checked').val();
+                   inputData.prediction = ' '
+                   inputData.grid1 = ''
+                   inputData.grid2 = ''
+                   inputData.grid3 = ''
+                   var outputData = ''
+            
+                   if (inputData.age == '') {
+                     alert("Please enter age!")
+                   }
+                   else if(inputData.age  >100) {
+                      alert("Passengers above age 100 are not allowed!! Woops! :( ");
+                   } else {         
+                     $.ajax({
+                     type: 'POST',
+                     // Provide correct Content-Type, so that Flask will know how to process it.
+                     contentType: 'application/json',
+                     // Encode data as JSON.
+                     data: JSON.stringify({inputData}),
+                     // This is the type of data expected back from the server.
+                     dataType: 'json',
+                     url: '/post',
+                     success: function (ret) {
+                       outputData = ret;
+                       console.log('RS : ' + outputData.inputData.prediction);
+                        grid1_ct =outputData.inputData.grid1;
+                        grid2_ct =outputData.inputData.grid2;
+                        grid3_ct =outputData.inputData.grid3;
+                       updatemessage(outputData.inputData.prediction);
+
+                     }
+                   });
+                     return false;
+                   }
+                   
+                 });
+
+           $('#plot').click(function(){
+                    console.log("plot clicked")
+                    $("#plotimages").show();
+                    console.log(grid1_ct)
+                    console.log(grid2_ct)
+                    console.log(grid3_ct)
+                    document.getElementById('grid1').innerHTML = "Computational time: " + grid1_ct
+                    document.getElementById('grid2').innerHTML = "Computational time: " + grid2_ct
+                    document.getElementById('grid3').innerHTML = "Computational time: " + grid3_ct
+                    });
+
+           $('#pic').on('click', function ()
+            {
+                $(this).width(1000);
+            });
+
+
+            $("#results_div").hide();
+            $("#query_div").show();
+            console.log('DR');
+            
+
+          });
+
+                 
+      </script>
+   </head>
+   <body>
+      <div class="wrapper row1">
+         <header id="header" class="clear">
+            <div id="hgroup">
+               <h1><a href="#">DDMiner</a></h1>
+               <h2>A Distributed Framework for Data Mining</h2>
+            </div>
+            </nav>
+         </header>
+      </div>
+      <!-- content -->
+      <div class="wrapper row2">
+         <div id="container" class="clear">
+            <!-- Slider -->
+            <div id='query_div'>
+               <section>
+                  <center>
+                     <form id="signup">
+                        <a>
+                           <h3>Would you have survived if sailed in Titanic?</h3>
+                           <hr>
+                           <h4 id=smallfont>Enter your details to know:</h4>
+                        </a>
+                        <a class="inputs">
+                           <table>
+                              <tr>
+                                 <td>Age</td>
+                                 <td colspan="2"><input id="age" type="text" onkeypress='return event.charCode >= 48 && event.charCode <= 57' placeholder="Age" autofocus /><br></td>
+                              </tr>
+                              <tr id="sex">
+                                 <td>Gender</td>
+                                 <td><input type="radio" name="gender" value="male" checked> Male</td>
+                                 <td><input type="radio" name="gender" value="female"> Female<br></td>
+                              </tr>
+                           </table>
+                           <button id="post" class="btn post">Submit</button>
+                        </a>
+                     </form>
+                    </center>
+                  </section>
+            </div>
+
+         <!-- main content -->
+         <div id="homepage">
+            <!-- Services -->
+            <div id='results_div'>
+              <center>
+               <section id="services" class="clear">
+                  <h3 id="postresult"></h3>
+                    <button id="plot">Show Plots</button>
+                     <div id='plotimages'>
+                     <article class="one_third">
+                        <figure>
+                          <a id="pic" class="fancybox" rel="gallery1" href="http://s32.postimg.org/drjz2ykmd/tree_plot_grid_1.png" title="Grid 1">
+                           <img src="http://s31.postimg.org/w4f9v2a9n/tree_plot_grid_1.png" width="290" height="180" alt=""></a>
+                           <figcaption>
+                              <h2>Decision tree for grid1</h2>
+                              <p> GRID: 1</p>
+                              <p id="grid1"></p>
+                           </figcaption>
+                        </figure>
+                     </article>
+                     <article class="one_third">
+                        <figure>
+                          <a id="pic"class="fancybox" rel="gallery1" href="http://s32.postimg.org/4uyyc4rxh/tree_plot_grid_2.png" title="Grid 1">
+                           <img src="http://s32.postimg.org/4uyyc4rxh/tree_plot_grid_2.png" width="290" height="180" alt=""></a>
+                           <figcaption>
+                              <h2>Decision tree for grid2</h2>
+                              <p> GRID: 2</p>
+                              <p id="grid2"></p>
+                           </figcaption>
+                        </figure>
+                     </article>
+                     <article class="one_third lastbox">
+                        <figure>
+                           <a id="pic" class="fancybox" rel="gallery1" href="http://s32.postimg.org/ogb0p850l/tree_plot_grid_3.png" title="Grid 1">
+                           <img src="http://s32.postimg.org/ogb0p850l/tree_plot_grid_3.png" width="290" height="180" alt=""></a>
+                           <figcaption>
+                              <h2>Decision tree for grid3</h2>
+                              <p> GRID: 3</p>
+                              <p id="grid3"></p>
+                           </figcaption>
+                        </figure>
+                     </article>
+                    </div>
+                  </section>
+               </center>
+            </div>
+         </div>
+         <!-- / content body -->
+        </div> 
+      </div>
+      <!-- Copyright -->
+      <div class="wrapper row4">
+         <footer id="copyright" class="clear">
+            <p class="fl_left">Project By: Dipti Chaudhari</a></p>
+         </footer>
+      </div>
+   </body>
+</html>
